@@ -6,41 +6,40 @@
 #include <time.h>
 using namespace std;
 
-
+//float C; //random process
 float A[5][6]; //our matrix
 float B[5][5]; //matrix of random tracing
 float W[5];    //values needed for tracing
 int N; //order of matrix
-int EQ_NUM; //needed equation
+int i, j; //index
+int Eq; //needed equation
 int M; //number of random realisations
+int T = 1, Y = 1,
+S = Eq;
+int V = 1; //simple value for sign
+float X; // koren`
 
-
-
-
+void func200();
+void func180();
 int sign(float);
-void OneMoreTime(bool,int,int,int,float);
 
 void main(){
-	int i, j;
+
 	
 
 	cout << "Input order of matrix [N]:";
 	cin >> N;
 
-	float A[5][6] = { {0, 0, 0, 0, 0 }, 
-		{ 0, 0.5714, -0.1429, 0.1429, 0.2857 }, 
-		{ 0, -0.1, 0.6, 0.2, 0.3 }, 
-		{ 0, -0.087, 0.0435, 0.7826, 0.6522 }
-	};
+	//float A[5][6] = { { 0.5714, -0.1429, 0.1429, 0.2857 }, { -0.1, 0.6, 0.2, 0.3 }, {-0.087, 0.0435, 0.7826, 0.6522} };
 	cout << "\n Input indexes of matrix: \n";
 	for (i = 1; i <= N; i++){
-		//cin >> A[i][1];
+		cin >> A[i][1];
 		B[i][1] = abs(A[i][1]);
 		for (j = 2; j <= N; j++){
-			//cin >> A[i][j];
+			cin >> A[i][j];
 			B[i][j] = B[i][j - 1] + abs(A[i][j]);
 		}
-		//cin >> A[i][N + 1];
+		cin >> A[i][N + 1];
 		cout << " The "<< i << " row end!\n";
 	};
 
@@ -69,11 +68,13 @@ void main(){
 	cout << "\n";
 
 	cout << "\nInput number of need i [Eq]:";
-	cin >> EQ_NUM;
+	cin >> Eq;
 	cout << "\nInput number of random realisations [M]:";
 	cin >> M;
+	S = Eq;
+	func200();
 	
-	OneMoreTime(true, EQ_NUM, 1, 1, 0);
+	
 	
 
 
@@ -81,52 +82,59 @@ void main(){
 	system("pause");
 	return;
 }
+void func200(){
+	//C = rand() % 1;
+	
+	bool repeat = true,
+		denied;
 
+	
+
+	while (repeat){
+		denied = false;
+		srand(time(NULL));
+		float C = (float)(rand()%9999)/(float)10000;
+		for (j = N; N > 1; j--){
+			if (C <= B[S][j]) continue;
+			if (j == N) { 
+				T = T + 1; 
+				Y = Y + V*W[S]; 
+				func180(); 
+				repeat = false; 
+				break;
+			}
+			else {
+				V = V*sign(A[S][j + 1]);
+				S = j + 1;
+				denied = true;
+				break;
+			}
+			
+
+		}
+		if (!denied) {
+			V = V*sign(A[S][1]);
+			S = 1;
+		}
+	}
+	
+}
+void func180(){
+	S = Eq;
+	Y = 1;
+	if (T > M) {
+		X = (float)Y / (float)M;
+		cout << "Our value of " << Eq << " equation is " << X;
+	}
+	else func200();
+
+}
 int sign(float value){
 	if (value > 0) return 1;
 	if (value < 0) return -1;
 	return 0;
 }
 
-void OneMoreTime(bool enter, int trace, int num_times, int val_sign, float val_of_eq){
-	int column;
-	int s = trace;
-	bool cond = enter;
-	int t = num_times;
-	int v = val_sign;
-	int y = val_of_eq;
-	int final_val;
-
-	
-	if (cond){
-		if (t > M) {
-			if (y == 0) y = 1;
-			final_val = y / M;
-			cout << "Value of equation is X=" << final_val;
-			return;
-		}
-		cond = false;
-	}
-	//random process
-	srand(time(NULL));
-	float c = (float)(rand() % 9999) / (float)10000;
-
-	for (int j = N; j > 1; j--){
-		if (c <= B[s][j]) continue;
-		if (j == N) {
-			t++;
-			y += v*W[s];
-			OneMoreTime(true, s, t, v, y);
-		}
-		else{
-			v *= sign(A[s][j + 1]);
-			OneMoreTime(false, j + 1, t, v, y);
-		}
-		
-	}
-	v *= sign(A[s][1]);
-	OneMoreTime(false, 1, t, v, y);
-}
 
 
 
