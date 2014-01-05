@@ -7,18 +7,24 @@
 using namespace std;
 
 
-float A[5][6]; //our matrix
+//float A[5][6]; //our matrix
+float A[5][6] = { {0, 0, 0, 0, 0 }, 
+		{ 0, 0.5714, -0.1429, 0.1429, 0.2857 }, 
+		{ 0, -0.1, 0.6, 0.2, 0.3 }, 
+		{ 0, -0.087, 0.0435, 0.7826, 0.6522 }
+	};
 float B[5][5]; //matrix of random tracing
 float W[5];    //values needed for tracing
 int N; //order of matrix
 int EQ_NUM; //needed equation
 int M; //number of random realisations
-
+bool done = false;
 
 
 
 int sign(float);
 void OneMoreTime(bool,int,int,int,float);
+void sec(bool,int,int,int,float);
 
 void main(){
 	int i, j;
@@ -27,11 +33,11 @@ void main(){
 	cout << "Input order of matrix [N]:";
 	cin >> N;
 
-	float A[5][6] = { {0, 0, 0, 0, 0 }, 
+	/*float A[5][6] = { {0, 0, 0, 0, 0 }, 
 		{ 0, 0.5714, -0.1429, 0.1429, 0.2857 }, 
 		{ 0, -0.1, 0.6, 0.2, 0.3 }, 
 		{ 0, -0.087, 0.0435, 0.7826, 0.6522 }
-	};
+	};*/
 	cout << "\n Input indexes of matrix: \n";
 	for (i = 1; i <= N; i++){
 		//cin >> A[i][1];
@@ -73,7 +79,7 @@ void main(){
 	cout << "\nInput number of random realisations [M]:";
 	cin >> M;
 	
-	OneMoreTime(true, EQ_NUM, 1, 1, 0);
+	sec(true, EQ_NUM, 1, 1, 0);
 	
 
 
@@ -89,7 +95,11 @@ int sign(float value){
 }
 
 void OneMoreTime(bool enter, int trace, int num_times, int val_sign, float val_of_eq){
-	int column;
+	if (done) {
+		return;
+	} else {
+		cout << "false" << endl;
+	}
 	int s = trace;
 	bool cond = enter;
 	int t = num_times;
@@ -102,13 +112,15 @@ void OneMoreTime(bool enter, int trace, int num_times, int val_sign, float val_o
 		if (t > M) {
 			if (y == 0) y = 1;
 			final_val = y / M;
-			cout << "Value of equation is X=" << final_val;
+			
+			done = true;
 			return;
 		}
 		cond = false;
 	}
 	//random process
 	srand(time(NULL));
+	float test = rand();
 	float c = (float)(rand() % 9999) / (float)10000;
 
 	for (int j = N; j > 1; j--){
@@ -128,5 +140,44 @@ void OneMoreTime(bool enter, int trace, int num_times, int val_sign, float val_o
 	OneMoreTime(false, 1, t, v, y);
 }
 
+void sec(bool enter, int trace, int num_times, int val_sign, float val_of_eq){
+	if (done) {
+		return;
+	} else {
+		cout << "false" << endl;
+	}
+	int s = trace;
+	bool cond = enter;
+	int t = num_times;
+	int v = val_sign;
+	int y = val_of_eq;
+	float final_val;
+
+l180:
+	s = trace;
+	y = 1;
+	if (t > M) {
+		goto l260;
+	}
+	srand(time(NULL));
+	float test = rand();
+l200:
+	float c = (float)(rand() % 9999) / (float)10000;
+	for (int j = N; j > 0; j--) {
+		if (c <= B[s][j]) continue;
+		if (j == N) {
+			t++;
+			y += v*W[s];
+			goto l180;
+		} else {
+			v *= sign(A[s][j+1]);
+			s = j + 1;
+			goto l200;
+		}
+	}
+l260:
+	final_val = (float)y / (float)M;
+	cout << "Value of equation is X=" << final_val << endl;
+}
 
 
